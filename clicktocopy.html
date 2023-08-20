@@ -64,7 +64,7 @@
   </style>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const variables = ["idNumber", "firstName", "lastName", "phoneNumber", "yawaReference", "emailAddress", "saYouthID"];
+      const variables = ["idNumber", "firstName", "lastName", "phoneNumber", "yawaReference", "emailAddress", "saYouthID","inboundid"];
 
       variables.forEach(variable => {
         const variableElem = document.getElementById(variable);
@@ -134,8 +134,8 @@
         <span class="name">YAWA Reference number:</span>
         <span class="value"></span>
       </div>
-      <div class="variable" id="emailAddress">
-        <span class="name">Email address:</span>
+      <div class="variable" id="inboundid">
+        <span class="name">ID Number if Inbound:</span>
         <span class="value"></span>
       </div>
       <div class="variable" id="saYouthID">
