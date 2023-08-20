@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click to Copy</title>
+</head>
+<body>
+    <script>
+        function copyToClipboard(text) {
+            const tempInput = document.createElement("input");
+            document.body.appendChild(tempInput);
+            tempInput.value = text;
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert("Copied to clipboard: " + text);
+        }
+
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const firstname = urlParams.get('firstname');
+            const id = urlParams.get('id');
+            const lastname = urlParams.get('lastname');
+
+            const firstnameElement = document.createElement("span");
+            firstnameElement.textContent = firstname;
+            firstnameElement.style.cursor = "pointer";
+            firstnameElement.addEventListener("click", function() {
+                copyToClipboard(firstname);
+            });
+            document.body.appendChild(firstnameElement);
+
+            const idElement = document.createElement("span");
+            idElement.textContent = id;
+            idElement.style.cursor = "pointer";
+            idElement.addEventListener("click", function() {
+                copyToClipboard(id);
+            });
+            document.body.appendChild(idElement);
+
+            const lastnameElement = document.createElement("span");
+            lastnameElement.textContent = lastname;
+            lastnameElement.style.cursor = "pointer";
+            lastnameElement.addEventListener("click", function() {
+                copyToClipboard(lastname);
+            });
+            document.body.appendChild(lastnameElement);
+        }
+    </script>
+</body>
+</html>
