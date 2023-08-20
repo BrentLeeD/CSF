@@ -1,90 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Click to Copy!</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        h1 {
-            margin-top: 30px;
-        }
-        .variable {
-            display: inline-block;
-            margin: 10px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            cursor: pointer;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .variable:hover {
-            background-color: #f0f0f0;
-        }
-        #copied-message {
-            display: none;
-            color: green;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Click to Copy!</title>
+  <style>
+    body {
+      font-size: 36px;
+      color: white;
+      background-color: black;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 48px;
+    }
+
+    h2 {
+      font-size: 24px;
+    }
+
+    #toggleButton {
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Click to Copy!</h1>
+  <h1>Click to Copy!</h1>
 
-    <div class="variable" id="firstname"></div>
-    <div class="variable" id="id"></div>
-    <div class="variable" id="lastname"></div>
-
-    <p id="copied-message">Text copied to clipboard!</p>
-
+  <div id="content">
     <script>
-        const copiedMessage = document.getElementById("copied-message");
+      const queryParams = new URLSearchParams(window.location.search);
+      const variables = [
+        { name: "ID Number", key: "idNumber", color: "yellow" },
+        { name: "First name", key: "firstName" },
+        { name: "Last name", key: "lastName" },
+        { name: "Phone number (primary)", key: "phoneNumber" },
+        { name: "YAWA Reference number", key: "yawaReference" },
+        { name: "Email address", key: "emailAddress" },
+        { name: "SAYouthID", key: "saYouthId" }
+      ];
 
-        function copyTextToClipboard(text) {
-            const tempInput = document.createElement("textarea");
-            tempInput.value = text;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand("copy");
-            document.body.removeChild(tempInput);
+      const contentDiv = document.getElementById("content");
+
+      variables.forEach(variable => {
+        const value = queryParams.get(variable.key);
+        if (value) {
+          const variableElement = document.createElement("div");
+          variableElement.style.marginTop = "10px";
+          variableElement.style.cursor = "pointer";
+          variableElement.style.color = variable.color || "white";
+          variableElement.innerHTML = `<span>${variable.name}:</span> <span>${value}</span>`;
+          variableElement.addEventListener("click", () => {
+            copyToClipboard(value);
+            showMessage("Copied!");
+          });
+          contentDiv.appendChild(variableElement);
         }
+      });
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const firstname = urlParams.get("firstname");
-            const id = urlParams.get("id");
-            const lastname = urlParams.get("lastname");
+      function copyToClipboard(text) {
+        const tempInput = document.createElement("input");
+        tempInput.value = text;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+      }
 
-            if (firstname) {
-                const firstnameDiv = document.getElementById("firstname");
-                firstnameDiv.textContent = `First Name: ${firstname}`;
-                firstnameDiv.addEventListener("click", () => {
-                    copyTextToClipboard(firstname);
-                    copiedMessage.style.display = "block";
-                });
-            }
+      function showMessage(message) {
+        const messageElement = document.createElement("div");
+        messageElement.style.fontSize = "18px";
+        messageElement.style.marginTop = "10px";
+        messageElement.innerText = message;
+        contentDiv.appendChild(messageElement);
+      }
 
-            if (id) {
-                const idDiv = document.getElementById("id");
-                idDiv.textContent = `ID: ${id}`;
-                idDiv.addEventListener("click", () => {
-                    copyTextToClipboard(id);
-                    copiedMessage.style.display = "block";
-                });
-            }
+      const toggleButton = document.createElement("button");
+      toggleButton.id = "toggleButton";
+      toggleButton.innerText = "Toggle Colours";
+      toggleButton.addEventListener("click", () => {
+        const body = document.body;
+        const isBlackTheme = body.style.backgroundColor === "black";
 
-            if (lastname) {
-                const lastnameDiv = document.getElementById("lastname");
-                lastnameDiv.textContent = `Last Name: ${lastname}`;
-                lastnameDiv.addEventListener("click", () => {
-                    copyTextToClipboard(lastname);
-                    copiedMessage.style.display = "block";
-                });
-            }
-        });
+        if (isBlackTheme) {
+          body.style.backgroundColor = "white";
+          body.style.color = "black";
+        } else {
+          body.style.backgroundColor = "black";
+          body.style.color = "white";
+        }
+      });
+
+      contentDiv.appendChild(toggleButton);
     </script>
+  </div>
 </body>
 </html>
