@@ -1,52 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Click to Copy</title>
+<title>Click to Copy</title>
+<style>
+
+body {
+  font-family: sans-serif;
+}
+
+h1 {
+  text-align: center;
+}
+
+div {
+  margin: 10px 0;
+}
+
+.variable {
+  display: flex;
+  align-items: center;
+}
+
+.variable-name {
+  font-weight: bold;
+}
+
+.variable-value {
+}
+
+.copy-message {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  text-align: center;
+  padding: 20px;
+  display: none;
+}
+
+</style>
 </head>
 <body>
-    <script>
-        function copyToClipboard(text) {
-            const tempInput = document.createElement("input");
-            document.body.appendChild(tempInput);
-            tempInput.value = text;
-            tempInput.select();
-            document.execCommand("copy");
-            document.body.removeChild(tempInput);
-            alert("Copied to clipboard: " + text);
-        }
 
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const firstname = urlParams.get('firstname');
-            const id = urlParams.get('id');
-            const lastname = urlParams.get('lastname');
+<h1>Click to Copy</h1>
 
-            const firstnameElement = document.createElement("span");
-            firstnameElement.textContent = firstname;
-            firstnameElement.style.cursor = "pointer";
-            firstnameElement.addEventListener("click", function() {
-                copyToClipboard(firstname);
-            });
-            document.body.appendChild(firstnameElement);
+<div id="variables">
 
-            const idElement = document.createElement("span");
-            idElement.textContent = id;
-            idElement.style.cursor = "pointer";
-            idElement.addEventListener("click", function() {
-                copyToClipboard(id);
-            });
-            document.body.appendChild(idElement);
+  {% for name, value in variables.items() %}
+    <div class="variable">
+      <span class="variable-name">{{ name }}</span>:
+      <span class="variable-value">{{ value }}</span>
+    </div>
+  {% endfor %}
 
-            const lastnameElement = document.createElement("span");
-            lastnameElement.textContent = lastname;
-            lastnameElement.style.cursor = "pointer";
-            lastnameElement.addEventListener("click", function() {
-                copyToClipboard(lastname);
-            });
-            document.body.appendChild(lastnameElement);
-        }
-    </script>
+</div>
+
+<script>
+
+// Get the variables from the URL
+var variables = {};
+window.location.search.substring(1).split('&').forEach(function(pair) {
+  var name = pair.split('=')[0];
+  var value = pair.split('=')[1];
+  variables[name] = value;
+});
+
+// Create a variable for each variable passed through the URL
+for (var name in variables) {
+  var element = document.createElement('div');
+  element.innerHTML = `
+    <span class="variable-name">{{ name }}</span>:
+    <span class="variable-value">{{ value }}</span>
+  `;
+  element.addEventListener('click', function() {
+    // Copy the variable to the clipboard
+    var text = element.querySelector('.variable-value').innerHTML;
+    navigator.clipboard.writeText(text);
+
+    // Show a message saying that the variable has been copied
+    document.querySelector('.copy-message').textContent = 'The variable ' + name + ' has been copied to your clipboard.';
+    document.querySelector('.copy-message').style.display = 'block';
+
+    // Hide the message after 2 seconds
+    setTimeout(function() {
+      document.querySelector('.copy-message').style.display = 'none';
+    }, 2000);
+  });
+
+  document.getElementById('variables').appendChild(element);
+}
+
+</script>
+
+<p class="copy-message">All you have to do is click the text you want to copy and viola!</p>
+
 </body>
 </html>
