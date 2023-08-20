@@ -6,95 +6,158 @@
   <title>Click to Copy!</title>
   <style>
     body {
-      font-size: 36px;
-      color: white;
       background-color: black;
-      text-align: center;
-      padding: 20px;
-    }
-
-    h1 {
-      font-size: 48px;
-    }
-
-    h2 {
+      color: white;
       font-size: 24px;
+      font-family: Arial, sans-serif;
     }
-
-    #toggleButton {
+    
+    .container {
+      text-align: center;
+      padding: 30px;
+    }
+    
+    h1 {
+      font-size: 36px;
+    }
+    
+    .subtitle {
+      font-size: 18px;
+    }
+    
+    .content {
       margin-top: 20px;
+    }
+    
+    .variable {
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    
+    .name {
+      font-weight: bold;
+    }
+    
+    .value {
+      display: inline-block;
+      margin-left: 10px;
+      border: 1px solid white;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+    
+    .message {
+      display: none;
+      color: limegreen;
+    }
+    
+    .toggle-button {
+      margin-top: 10px;
+    }
+    
+    button {
+      background-color: white;
+      color: black;
+      border: none;
+      padding: 8px 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    .white-background {
+      background-color: white;
+      color: black;
+    }
+    
+    .black-background {
+      background-color: black;
+      color: white;
     }
   </style>
 </head>
 <body>
-  <h1>Click to Copy!</h1>
-
-  <div id="content">
-    <script>
-      const queryParams = new URLSearchParams(window.location.search);
-      const variables = [
-        { name: "ID Number", key: "idNumber", color: "yellow" },
-        { name: "First name", key: "firstName" },
-        { name: "Last name", key: "lastName" },
-        { name: "Phone number (primary)", key: "phoneNumber" },
-        { name: "YAWA Reference number", key: "yawaReference" },
-        { name: "Email address", key: "emailAddress" },
-        { name: "SAYouthID", key: "saYouthId" }
-      ];
-
-      const contentDiv = document.getElementById("content");
+  <div class="container">
+    <h1>Click to Copy!</h1>
+    <p class="subtitle">Click on a variable to copy:</p>
+    <div class="content">
+      <div class="variable" id="idNumber">
+        <span class="name">ID Number:</span>
+        <span class="value"></span>
+      </div>
+      <div class="variable" id="firstName">
+        <span class="name">First name:</span>
+        <span class="value"></span>
+      </div>
+      <div class="variable" id="lastName">
+        <span class="name">Last name:</span>
+        <span class="value"></span>
+      </div>
+      <div class="variable" id="phoneNumber">
+        <span class="name">Phone number (primary):</span>
+        <span class="value"></span>
+      </div>
+      <div class="variable" id="yawaReference">
+        <span class="name">YAWA Reference number:</span>
+        <span class="value"></span>
+      </div>
+      <div class="variable" id="emailAddress">
+        <span class="name">Email address:</span>
+        <span class="value"></span>
+      </div>
+      <div class="variable" id="saYouthID">
+        <span class="name">SAYouthID:</span>
+        <span class="value"></span>
+      </div>
+    </div>
+    <div class="toggle-button">
+      <button id="toggleAccessibility">Toggle Accessibility</button>
+    </div>
+    <p class="message">Copied!</p>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const variables = ["idNumber", "firstName", "lastName", "phoneNumber", "yawaReference", "emailAddress", "saYouthID"];
 
       variables.forEach(variable => {
-        const value = queryParams.get(variable.key);
+        const variableElem = document.getElementById(variable);
+        const valueElem = variableElem.querySelector(".value");
+        
+        const params = new URLSearchParams(window.location.search);
+        const value = params.get(variable);
+        
         if (value) {
-          const variableElement = document.createElement("div");
-          variableElement.style.marginTop = "10px";
-          variableElement.style.cursor = "pointer";
-          variableElement.style.color = variable.color || "white";
-          variableElement.innerHTML = `<span>${variable.name}:</span> <span>${value}</span>`;
-          variableElement.addEventListener("click", () => {
+          valueElem.textContent = value;
+          variableElem.addEventListener("click", () => {
             copyToClipboard(value);
-            showMessage("Copied!");
+            showCopiedMessage();
           });
-          contentDiv.appendChild(variableElement);
+        } else {
+          variableElem.style.display = "none";
         }
+      });
+
+      const toggleButton = document.getElementById("toggleAccessibility");
+      toggleButton.addEventListener("click", () => {
+        document.body.classList.toggle("white-background");
       });
 
       function copyToClipboard(text) {
-        const tempInput = document.createElement("input");
-        tempInput.value = text;
-        document.body.appendChild(tempInput);
-        tempInput.select();
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
         document.execCommand("copy");
-        document.body.removeChild(tempInput);
+        document.body.removeChild(textarea);
       }
 
-      function showMessage(message) {
-        const messageElement = document.createElement("div");
-        messageElement.style.fontSize = "18px";
-        messageElement.style.marginTop = "10px";
-        messageElement.innerText = message;
-        contentDiv.appendChild(messageElement);
+      function showCopiedMessage() {
+        const message = document.querySelector(".message");
+        message.style.display = "block";
+        setTimeout(() => {
+          message.style.display = "none";
+        }, 2000);
       }
-
-      const toggleButton = document.createElement("button");
-      toggleButton.id = "toggleButton";
-      toggleButton.innerText = "Toggle Colours";
-      toggleButton.addEventListener("click", () => {
-        const body = document.body;
-        const isBlackTheme = body.style.backgroundColor === "black";
-
-        if (isBlackTheme) {
-          body.style.backgroundColor = "white";
-          body.style.color = "black";
-        } else {
-          body.style.backgroundColor = "black";
-          body.style.color = "white";
-        }
-      });
-
-      contentDiv.appendChild(toggleButton);
-    </script>
-  </div>
+    });
+  </script>
 </body>
 </html>
