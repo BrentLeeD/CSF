@@ -11,33 +11,26 @@
       font-size: 24px;
       font-family: Arial, sans-serif;
     }
-    
     .container {
       text-align: center;
       padding: 30px;
     }
-    
     h1 {
       font-size: 36px;
     }
-    
     .subtitle {
       font-size: 18px;
     }
-    
     .content {
       margin-top: 20px;
     }
-    
     .variable {
       margin-bottom: 10px;
       cursor: pointer;
     }
-    
     .name {
       font-weight: bold;
     }
-    
     .value {
       display: inline-block;
       margin-left: 10px;
@@ -45,35 +38,76 @@
       padding: 5px 10px;
       border-radius: 5px;
     }
-    
     .message {
       display: none;
       color: limegreen;
     }
-    
     .toggle-button {
-      margin-top: 10px;
+      margin-top: 20px;
     }
-    
     button {
       background-color: white;
       color: black;
       border: none;
-      padding: 8px 8px;
+      padding: 10px 20px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 18px;
     }
-    
     .white-background {
       background-color: white;
       color: black;
     }
-    
     .black-background {
       background-color: black;
       color: white;
     }
   </style>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const variables = ["idNumber", "firstName", "lastName", "phoneNumber", "yawaReference", "emailAddress", "saYouthID"];
+
+      variables.forEach(variable => {
+        const variableElem = document.getElementById(variable);
+        const valueElem = variableElem.querySelector(".value");
+
+        const params = new URLSearchParams(window.location.search);
+        const value = params.get(variable);
+
+        if (value) {
+          valueElem.textContent = value;
+          variableElem.addEventListener("click", () => {
+            copyToClipboard(value);
+            showCopiedMessage(variable, value);
+          });
+        } else {
+          variableElem.style.display = "none";
+        }
+      });
+
+      const toggleButton = document.getElementById("toggleAccessibility");
+      toggleButton.addEventListener("click", () => {
+        document.body.classList.toggle("white-background");
+      });
+
+      function copyToClipboard(text) {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+
+      function showCopiedMessage(variable, value) {
+        const message = document.querySelector(".message");
+        message.textContent = `${variable} Copied!`;
+        message.style.display = "block";
+        setTimeout(() => {
+          message.style.display = "none";
+        }, 2000);
+      }
+    });
+  </script>
 </head>
 <body>
   <div class="container">
@@ -112,52 +146,7 @@
     <div class="toggle-button">
       <button id="toggleAccessibility">Toggle Accessibility</button>
     </div>
-    <p class="message">Copied!</p>
+    <p class="message"></p>
   </div>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const variables = ["idNumber", "firstName", "lastName", "phoneNumber", "yawaReference", "emailAddress", "saYouthID"];
-
-      variables.forEach(variable => {
-        const variableElem = document.getElementById(variable);
-        const valueElem = variableElem.querySelector(".value");
-        
-        const params = new URLSearchParams(window.location.search);
-        const value = params.get(variable);
-        
-        if (value) {
-          valueElem.textContent = value;
-          variableElem.addEventListener("click", () => {
-            copyToClipboard(value);
-            showCopiedMessage();
-          });
-        } else {
-          variableElem.style.display = "none";
-        }
-      });
-
-      const toggleButton = document.getElementById("toggleAccessibility");
-      toggleButton.addEventListener("click", () => {
-        document.body.classList.toggle("white-background");
-      });
-
-      function copyToClipboard(text) {
-        const textarea = document.createElement("textarea");
-        textarea.value = text;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textarea);
-      }
-
-      function showCopiedMessage() {
-        const message = document.querySelector(".message");
-        message.style.display = "block";
-        setTimeout(() => {
-          message.style.display = "none";
-        }, 2000);
-      }
-    });
-  </script>
 </body>
 </html>
