@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Variable Info App</title>
+</head>
+<body>
+    <h1>Variable Information</h1>
+    
+    <div>
+        <p>First Name: <span id="firstname"></span></p>
+        <p>Last Name: <span id="lastname"></span></p>
+        <p>ID: <span id="id"></span></p>
+    </div>
+
+    <button id="copyButton">Copy to Clipboard</button>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const firstName = urlParams.get('firstname');
+        const lastName = urlParams.get('lastname');
+        const id = urlParams.get('id');
+
+        document.getElementById('firstname').textContent = firstName;
+        document.getElementById('lastname').textContent = lastName;
+        document.getElementById('id').textContent = id;
+
+        const copyButton = document.getElementById('copyButton');
+        copyButton.addEventListener('click', function() {
+            const textToCopy = `First Name: ${firstName}\nLast Name: ${lastName}\nID: ${id}`;
+            navigator.clipboard.writeText(textToCopy).then(function() {
+                alert('Info copied to clipboard!');
+            }).catch(function(err) {
+                console.error('Unable to copy text: ', err);
+            });
+        });
+    </script>
+</body>
+</html>
