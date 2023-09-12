@@ -27,6 +27,9 @@
     .variable {
       margin-bottom: 10px;
       cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .name {
       font-weight: bold;
@@ -39,7 +42,6 @@
       border-radius: 5px;
     }
     .message {
-      display: none;
       color: limegreen;
     }
     .toggle-button {
@@ -64,11 +66,12 @@
   </style>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const variables = ["idNumber", "firstName", "lastName", "phoneNumber", "yawaReference", "inboundid", "saYouthID"];
+      const variables = ["idNumber", "firstName", "lastName", "phoneNumber", "yawaReference", "inboundid", "saYouthID", "conversationId"];
 
       variables.forEach(variable => {
         const variableElem = document.getElementById(variable);
         const valueElem = variableElem.querySelector(".value");
+        const messageElem = variableElem.querySelector(".message");
 
         const params = new URLSearchParams(window.location.search);
         const value = params.get(variable);
@@ -77,7 +80,7 @@
           valueElem.textContent = value;
           variableElem.addEventListener("click", () => {
             copyToClipboard(value);
-            showCopiedMessage(variable, value);
+            showCopiedMessage(messageElem, value);
           });
         } else {
           variableElem.style.display = "none";
@@ -98,13 +101,8 @@
         document.body.removeChild(textarea);
       }
 
-      function showCopiedMessage(variable, value) {
-        const message = document.querySelector(".message");
-        message.textContent = `${variable} Copied!`;
-        message.style.display = "block";
-        setTimeout(() => {
-          message.style.display = "none";
-        }, 2000);
+      function showCopiedMessage(messageElem, value) {
+        messageElem.textContent = `${value} Copied!`;
       }
     });
   </script>
@@ -117,36 +115,47 @@
       <div class="variable" id="idNumber">
         <span class="name">ID Number:</span>
         <span class="value"></span>
+        <span class="message"></span>
       </div>
       <div class="variable" id="firstName">
         <span class="name">First name:</span>
         <span class="value"></span>
+        <span class="message"></span>
       </div>
       <div class="variable" id="lastName">
         <span class="name">Last name:</span>
         <span class="value"></span>
+        <span class="message"></span>
       </div>
       <div class="variable" id="phoneNumber">
         <span class="name">Phone number (primary):</span>
         <span class="value"></span>
+        <span class="message"></span>
       </div>
       <div class="variable" id="yawaReference">
         <span class="name">YAWA Reference number:</span>
         <span class="value"></span>
+        <span class="message"></span>
       </div>
       <div class="variable" id="inboundid">
         <span class="name">ID Number if Inbound:</span>
         <span class="value"></span>
+        <span class="message"></span>
       </div>
       <div class="variable" id="saYouthID">
         <span class="name">SAYouthID:</span>
         <span class="value"></span>
+        <span class="message"></span>
+      </div>
+      <div class="variable" id="conversationId">
+        <span class="name">Conversation ID:</span>
+        <span class="value"></span>
+        <span class="message"></span>
       </div>
     </div>
     <div class="toggle-button">
       <button id="toggleAccessibility">Toggle Accessibility</button>
     </div>
-    <p class="message"></p>
   </div>
 </body>
 </html>
