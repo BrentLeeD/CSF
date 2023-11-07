@@ -1,95 +1,275 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Infobip SMS Log Search</title>
-<style>
-body {
-  font-family: sans-serif;
-}
-
-h1 {
-  text-align: center;
-}
-
-table {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-th, td {
-  border: 1px solid black;
-  padding: 8px;
-}
-
-th {
-  text-align: left;
-}
-
-.error {
-  color: red;
-}
-
-.sent-at {
-  color: #999;
-  font-size: 12px;
-}
-
-@media (max-width: 500px) {
-  table {
-    width: 100%;
-  }
-}
-</style>
+  <title>WhatsApp Message Builder</title>
 </head>
 <body>
-<h1>Infobip SMS Log Search</h1>
-<p>Enter a phone number (starting with 27) and hit search to see all messages sent to sent to your caller in the past 48hrs</p>
-<input type="text" id="phone_number" placeholder="Phone number">
-<button id="search">Search</button>
-<div id="results"></div>
-<script>
-const phone_number = document.getElementById("phone_number");
-const search = document.getElementById("search");
-const results = document.getElementById("results");
 
-search.addEventListener("click", async () => {
-  const url = `https://wp2n28.api.infobip.com/sms/1/logs?to=${phone_number.value}&content-type=application/json`;
-  const headers = {
-    Authorization: " ${{ secrets.INFOBIP }} "
+  <label for="from">From:</label>
+  <input type="text" id="from" value="441134960000">
+
+  <label for="to">To:</label>
+  <input type="text" id="to" value="441134960001">
+
+  <label for="notifyUrl">Notify URL:</label>
+  <input type="text" id="notifyUrl" value="https://www.example.com/whatsapp">
+
+  <h3>Message Type:</h3>
+  <select id="messageType">
+    <option value="buttons">Buttons</option>
+    <option value="list">List</option> 
+    <option value="audio">Audio</option>
+    <option value="image">Image</option>
+  </select>
+
+  <div id="buttons">
+    <label for="buttonText1">Button 1 Text:</label>
+    <input type="text" id="buttonText1">
+    
+    <label for="buttonText2">Button 2 Text:</label>    
+    <input type="text" id="buttonText2">
+  </div>
+
+  <div id="list">
+    <label for="listHeader">List Header:</label>
+    <input type="text" id="listHeader">
+
+    <button id="addListItem">Add List Item</button>
+
+    <div id="listItems"></div>
+  </div>
+
+  <div id="audio">
+    <label for="audioUrl">Audio URL:</label>
+    <input type="text" id="audioUrl"> 
+  </div>
+
+  <div id="image">
+    <label for="imageUrl">Image URL:</label>
+    <input type="text" id="imageUrl">
+
+    <label for="caption">Caption:</label>
+    <input type="text" id="caption">
+  </div>
+
+  <button onclick="generateJSON()">Generate JSON</button>
+
+  <pre id="jsonResult"></pre>
+<style>/* Style inputs */
+input[type="text"] {
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  border: 2px solid #555;
+  border-radius: 4px;
+}
+
+/* Style select menu */  
+select {
+  padding: 12px 20px; 
+  margin: 8px 0;
+  width: 100%;
+  border: 2px solid #555;
+  border-radius: 4px;
+}
+
+/* Style buttons */
+button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+/* Style labels */
+label {
+  font-weight: bold;
+}
+
+/* Style pre tag for JSON */
+pre {
+  padding: 12px 20px;
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  white-space: pre-wrap;
+}
+
+/* Overall page styling */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  padding: 20px;
+}
+
+h3 {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+  margin-bottom: 20px; 
+}</style>
+<script>
+
+// Hide message type sections initially
+document.getElementById('buttons').style.display = 'none';
+document.getElementById('list').style.display = 'none';
+document.getElementById('audio').style.display = 'none'; 
+document.getElementById('image').style.display = 'none';
+
+// Show relevant section when message type changes
+document.getElementById('messageType').addEventListener('change', (e) => {
+  const type = e.target.value;
+  
+  document.getElementById('buttons').style.display = type === 'buttons' ? 'block' : 'none';
+  document.getElementById('list').style.display = type === 'list' ? 'block' : 'none';
+  document.getElementById('audio').style.display = type === 'audio' ? 'block' : 'none';
+  document.getElementById('image').style.display = type === 'image' ? 'block' : 'none';  
+});
+
+// Add list item
+let listItemCount = 1;
+
+document.getElementById('addListItem').addEventListener('click', () => {
+  const listItem = document.createElement('div');
+  listItem.innerHTML = `
+    <label for="listItemTitle${listItemCount}">Title:</label>
+    <input type="text" id="listItemTitle${listItemCount}" placeholder="Enter title">
+
+    <label for="listItemDesc${listItemCount}">Description:</label>
+    <input type="text" id="listItemDesc${listItemCount}" placeholder="Enter description">
+  `;
+
+  document.getElementById('listItems').appendChild(listItem);
+  listItemCount++;
+});
+
+// Generate JSON
+function generateJSON() {
+
+  const messageType = document.getElementById('messageType').value;
+
+  let content;
+
+  if (messageType === 'buttons') {
+    const buttonText1 = document.getElementById('buttonText1').value;
+    const buttonText2 = document.getElementById('buttonText2').value;
+
+    content = {
+      body: {
+        text: "Message text"  
+      },
+      action: {
+        buttons: [
+          { 
+            type: "REPLY",
+            id: "1",
+            title: buttonText1
+          },
+          {
+            type: "REPLY",
+            id: "2",
+            title: buttonText2
+          }
+        ]
+      }
+    };
+  }
+
+  if (messageType === 'list') {
+    const header = document.getElementById('listHeader').value;
+
+    const rows = [];
+    for(let i=1; i<=listItemCount; i++) {
+      const title = document.getElementById(`listItemTitle${i}`).value; 
+      const desc = document.getElementById(`listItemDesc${i}`).value;
+      rows.push({
+        id: i.toString(),
+        title: title,
+        description: desc
+      });
+    }
+
+    content = {
+      body: {
+        text: "Message text"
+      },
+      action: {
+        title: "Choose one",  
+        sections: [
+          {
+            title: header,
+            rows: rows  
+          }
+        ]
+      }
+    };
+  }
+
+  if (messageType === 'audio') {
+    const audioUrl = document.getElementById('audioUrl').value;
+    content = {
+      mediaUrl: audioUrl
+    };
+  }
+
+  if (messageType === 'image') {
+    const imageUrl = document.getElementById('imageUrl').value;
+    const caption = document.getElementById('caption').value;
+    content = {
+      mediaUrl: imageUrl,
+      caption: caption
+    };
+  }
+
+  const from = document.getElementById('from').value;
+  const to = document.getElementById('to').value;
+  const notifyUrl = document.getElementById('notifyUrl').value;
+
+  const json = {
+    from: from,
+    to: to,
+    messageId: "1234",
+    content: content,
+    callbackData: "callback data",
+    notifyUrl: notifyUrl
   };
 
-  try {
-    const response = await fetch(url, { headers });
-    const data = await response.json();
+  document.getElementById('jsonResult').innerText = JSON.stringify(json, null, 2);
 
-    if (data.results.length === 0) {
-      results.innerHTML = "No results";
-    } else {
-      results.innerHTML = `
-        <table>
-          <tr>
-            <th>Text</th>
-            <th>Status</th>
-            <th>Sent At</th>
-          </tr>
-          ${data.results.map(result => `
-            <tr>
-              <td>${result.text}</td>
-              <td>${result.status.name}</td>
-              <td class="sent-at">${result.sentAt.slice(0, 10)} at ${result.sentAt.slice(11, 19)}</td>
-            </tr>
-          `)}
-        </table>
-      `;
-    }
-  } catch (error) {
-    results.innerHTML = `
-      <div class="error">
-        ${error.message}
-      </div>
-    `;
-  }
+}
+// Add copy request button
+const copyButton = document.createElement('button');
+copyButton.innerText = 'Copy Request';
+
+copyButton.addEventListener('click', () => {
+  navigator.clipboard.writeText(document.getElementById('jsonResult').innerText);
 });
+
+document.body.appendChild(copyButton);
+// API URLs
+const urls = {
+  list: 'https://wp2n28.api.infobip.com/whatsapp/1/message/interactive/list?Content-Type=application/json',
+  buttons: 'https://wp2n28.api.infobip.com/whatsapp/1/message/interactive/buttons?Content-Type=application/json',
+  audio: 'https://wp2n28.api.infobip.com/whatsapp/1/message/audio',
+  image: 'https://wp2n28.api.infobip.com/whatsapp/1/message/image'
+};
+
+// Display relevant URL
+const urlElement = document.createElement('div');
+document.body.appendChild(urlElement);
+
+document.getElementById('messageType').addEventListener('change', (e) => {
+  const type = e.target.value;
+  urlElement.innerText = `API URL: ${urls[type]}`;
+});
+
 </script>
+
 </body>
 </html>
