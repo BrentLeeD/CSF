@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Click to Copy!</title>
-  <style>
+<style>
     body {
       background-color: black;
       color: white;
@@ -64,9 +64,53 @@
       color: white;
     }
   </style>
+</head>
+<body>
+  <div class="container">
+    <h1 id="callOpening"></h1>
+    <p class="subtitle">Click on a variable to copy:</p>
+    <div class="content">
+      <!-- ... (variables remain the same) -->
+    </div>
+    <div class="toggle-button">
+      <button id="toggleAccessibility">Toggle Accessibility</button>
+    </div>
+  </div>
+
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const variables = ["idNumber", "firstName", "lastName", "phoneNumber", "yawaReference", "inboundid", "saYouthID", "conversationId"];
+      const variables = ["idNumber", "firstName", "lastName", "phoneNumber", "yawaReference", "GuideName", "saYouthID", "conversationId"];
+
+      const callOpeningElem = document.getElementById("callOpening");
+      let callOpening = "";
+
+      variables.forEach(variable => {
+        const variableElem = document.getElementById(variable);
+        const valueElem = variableElem.querySelector(".value");
+        const messageElem = variableElem.querySelector(".message");
+
+        const params = new URLSearchParams(window.location.search);
+        const value = params.get(variable);
+
+        if (value) {
+          valueElem.textContent = value;
+
+          if (variable === "GuideName" || variable === "firstName" || variable === "lastName") {
+            callOpening += `${value} `;
+          }
+
+          variableElem.addEventListener("click", () => {
+            copyToClipboard(value);
+            showCopiedMessage(messageElem, value);
+          });
+        } else {
+          variableElem.style.display = "none";
+        }
+      });
+
+      callOpeningElem.textContent = `Hello/Good day, my name is ${callOpening}and I'm calling you from SA youth. Could I please speak to [FirstName] [Surname]?`;
+  document.addEventListener("DOMContentLoaded", () => {
+      const variables = ["idNumber", "firstName", "lastName", "phoneNumber", "yawaReference", "GuideName", "saYouthID", "conversationId"];
 
       variables.forEach(variable => {
         const variableElem = document.getElementById(variable);
@@ -92,6 +136,13 @@
         document.body.classList.toggle("white-background");
       });
 
+      // Update the title with the variable values
+      const guideName = params.get("GuideName") || "[GuideName]";
+      const firstName = params.get("firstName") || "[FirstName]";
+      const lastName = params.get("lastName") || "[Surname]";
+      const title = document.querySelector("h1");
+      title.textContent = `Hello/Good day, my name is ${guideName} and I'm calling you from SA youth. Could I please speak to ${firstName} ${lastName}?`;
+
       function copyToClipboard(text) {
         const textarea = document.createElement("textarea");
         textarea.value = text;
@@ -106,56 +157,5 @@
       }
     });
   </script>
-</head>
-<body>
-  <div class="container">
-    <h1>Click to Copy!</h1>
-    <p class="subtitle">Click on a variable to copy:</p>
-    <div class="content">
-      <div class="variable" id="idNumber">
-        <span class="name">ID Number:</span>
-        <span class="value"></span>
-        <span class="message"></span>
-      </div>
-      <div class="variable" id="firstName">
-        <span class="name">First name:</span>
-        <span class="value"></span>
-        <span class="message"></span>
-      </div>
-      <div class="variable" id="lastName">
-        <span class="name">Last name:</span>
-        <span class="value"></span>
-        <span class="message"></span>
-      </div>
-      <div class="variable" id="phoneNumber">
-        <span class="name">Phone number (primary):</span>
-        <span class="value"></span>
-        <span class="message"></span>
-      </div>
-      <div class="variable" id="yawaReference">
-        <span class="name">YAWA Reference number:</span>
-        <span class="value"></span>
-        <span class="message"></span>
-      </div>
-      <div class="variable" id="inboundid">
-        <span class="name">ID Number if Inbound:</span>
-        <span class="value"></span>
-        <span class="message"></span>
-      </div>
-      <div class="variable" id="saYouthID">
-        <span class="name">SAYouthID:</span>
-        <span class="value"></span>
-        <span class="message"></span>
-      </div>
-      <div class="variable" id="conversationId">
-        <span class="name">Conversation ID:</span>
-        <span class="value"></span>
-        <span class="message"></span>
-      </div>
-    </div>
-    <div class="toggle-button">
-      <button id="toggleAccessibility">Toggle Accessibility</button>
-    </div>
-  </div>
 </body>
 </html>
